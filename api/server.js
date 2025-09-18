@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
 // Handle React routing in production
 if (process.env.NODE_ENV === "production") {
     app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+        res.sendFile(path.join(__dirname, '../client','dist', 'index.html'));
     });
 }
 

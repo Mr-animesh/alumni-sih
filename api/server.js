@@ -9,7 +9,6 @@ const path = require("path");
 
 dotenv.config();
 
-const __dirname = path.resolve();
 
 const app = express();
 const server = http.createServer(app);

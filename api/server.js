@@ -5,16 +5,32 @@ const dotenv = require("dotenv");
 const http = require("http");
 const { Server } = require("socket.io");
 const Message = require("./models/Message");
+const path = require("path");
 
 dotenv.config();
 
+const __dirname = path.resolve();
+
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+  cors: { 
+    origin: process.env.NODE_ENV === "production" 
+      ? "https://your-domain.onrender.com" 
+      : "*"
+  }
+});
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files in production
+if (process.env.NODE_ENV === "production") {
+    // Serve static files from the React build directory
+    app.use(express.static(path.join(__dirname, '../client/build')));
+}
+
 
 // DB Connection
 const connectDB = require("./config/db");
@@ -65,6 +81,13 @@ io.on("connection", (socket) => {
     console.log("Client disconnected:", socket.id);
   });
 });
+
+// Handle React routing in production
+if (process.env.NODE_ENV === "production") {
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    });
+}
 
 // Start server
 const PORT = process.env.PORT || 5000;
